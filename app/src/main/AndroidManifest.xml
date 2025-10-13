@@ -15,7 +15,6 @@
         <activity
             android:name=".ui.signin.SignInActivity"
             android:exported="true"
-            android:label="@string/title_activity_sign_in"
             android:theme="@style/Theme.Dive">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
