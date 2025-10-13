@@ -1,4 +1,4 @@
-package com.sopt.dive
+package com.sopt.dive.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,12 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.sopt.dive.ui.theme.DiveTheme
 
+/**
+ * 메인 페이지
+ * */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            DiveTheme {
+            DiveTheme(
+                darkTheme = false
+            ) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = "Android",
