@@ -31,11 +31,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sopt.dive.ui.core.component.DiveSoptButton
-import com.sopt.dive.ui.core.component.FormField
+import com.sopt.dive.core.designsystem.component.DiveSoptButton
+import com.sopt.dive.core.designsystem.component.FormField
 import com.sopt.dive.ui.main.MainActivity
 import com.sopt.dive.ui.signup.SignUpActivity
-import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.core.designsystem.theme.DiveTheme
 
 class SignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

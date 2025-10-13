@@ -1,4 +1,4 @@
-package com.sopt.dive.ui.core.component
+package com.sopt.dive.core.designsystem.component
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -14,7 +14,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.sopt.dive.R
-import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.core.designsystem.theme.DiveTheme
 
 @Composable
 fun DiveSoptTextField(

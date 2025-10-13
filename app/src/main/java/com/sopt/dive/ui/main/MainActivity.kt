@@ -28,11 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sopt.dive.R
-import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.core.designsystem.theme.DiveTheme
 
 /**
  * 메인 페이지

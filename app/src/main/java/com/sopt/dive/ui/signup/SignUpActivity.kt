@@ -25,11 +25,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sopt.dive.ui.core.component.DiveSoptButton
-import com.sopt.dive.ui.core.component.FormField
+import com.sopt.dive.core.designsystem.component.DiveSoptButton
+import com.sopt.dive.core.designsystem.component.FormField
 import com.sopt.dive.ui.signin.SignInActivity
 import com.sopt.dive.ui.signup.util.validateSignUpForm
-import com.sopt.dive.ui.theme.DiveTheme
+import com.sopt.dive.core.designsystem.theme.DiveTheme
 
 class SignUpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
