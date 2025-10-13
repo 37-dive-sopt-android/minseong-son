@@ -89,7 +89,7 @@ fun MainScreen(
                 painter = painterResource(id = R.drawable.img),
                 contentDescription = "프로필 사진",
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
                     .background(
                         color = Color.White,
