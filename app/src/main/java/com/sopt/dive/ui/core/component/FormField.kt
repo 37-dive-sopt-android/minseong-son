@@ -49,8 +49,7 @@ fun FormField(
 
     Text(
         text = label,
-        fontSize = 36.sp,
-        fontWeight = FontWeight.Thin,
+        fontSize = 32.sp,
         modifier = Modifier
             .fillMaxWidth(),
         textAlign = TextAlign.Start
