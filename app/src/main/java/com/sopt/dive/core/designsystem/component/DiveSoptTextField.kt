@@ -1,51 +1,77 @@
 package com.sopt.dive.core.designsystem.component
 
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.theme.DiveTheme
-
 @Composable
 fun DiveSoptTextField(
-    text : String,
+    state: TextFieldState,
     placeholder : String,
-    onTextChange : (String) -> Unit,
+    inputTransformation: InputTransformation?,
+    outputTransformation: OutputTransformation?,
+    onImeActionPerformed: () -> Unit,
     modifier: Modifier = Modifier,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
+    imeAction: ImeAction = ImeAction.Next,
     trailingIcon : @Composable (() -> Unit)? = null
 ) {
-    TextField(
-        value = text,
-        onValueChange = onTextChange,
-        modifier = modifier,
-        maxLines = 1,
-        visualTransformation = visualTransformation,
-        placeholder = {
-            Text(
-                text = placeholder,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.DarkGray
-            )
-        },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent,
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-            unfocusedIndicatorColor = Color.DarkGray,
-            focusedIndicatorColor = MaterialTheme.colorScheme.primary
+    val colorBrush = remember {
+        Brush.linearGradient(
+            colors = listOf(
+                Color.Red,
+                Color.Yellow,
+                Color.Green,
+                Color.Blue,
+                Color.Magenta
+            )
+        )
+    }
+
+    TextField(
+        state = state,
+        modifier = modifier,
+        placeholder = { Text(text = placeholder) },
+        lineLimits = TextFieldLineLimits.SingleLine,
+        trailingIcon = trailingIcon,
+        inputTransformation = inputTransformation,
+        outputTransformation = outputTransformation,
+        keyboardOptions = KeyboardOptions(imeAction = imeAction),
+        onKeyboardAction = {
+            if (imeAction == ImeAction.Done) {
+                keyboardController?.hide()
+            } else {
+                onImeActionPerformed()
+            }
+        },
+        textStyle = TextStyle(
+            brush = colorBrush
         ),
-        trailingIcon = trailingIcon
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
+        )
     )
 }
 
@@ -53,10 +79,13 @@ fun DiveSoptTextField(
 @Composable
 private fun DiveSoptTextFieldPreview() {
     DiveTheme {
+        val state = TextFieldState()
         DiveSoptTextField(
-            text = "",
-            onTextChange = {},
+            state = state,
+            inputTransformation = null,
+            outputTransformation = null,
             placeholder ="아이디 입력해주세요",
+            onImeActionPerformed = {},
             trailingIcon = {
                 IconButton(onClick = {}) {
                     Icon(
