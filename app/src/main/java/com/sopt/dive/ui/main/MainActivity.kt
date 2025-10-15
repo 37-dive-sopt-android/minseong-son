@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +32,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sopt.dive.R
+import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.theme.DiveTheme
+import com.sopt.dive.data.remote.AuthManager
+import kotlinx.coroutines.launch
 
 /**
  * 메인 페이지
@@ -40,11 +44,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        AuthManager.init(this@MainActivity)
 
-        val userId = intent.getStringExtra("USER_ID")
-        val userPassword = intent.getStringExtra("USER_PASSWORD")
-        val userNickname = intent.getStringExtra("USER_NICKNAME")
-        val userAlcohol = intent.getStringExtra("USER_ALCOHOL")
+        val userId = intent.getStringExtra("USER_ID") ?: ""
+        val userPassword = intent.getStringExtra("USER_PASSWORD") ?: ""
+        val userNickname = intent.getStringExtra("USER_NICKNAME") ?: ""
+        val userAlcohol = intent.getStringExtra("USER_ALCOHOL") ?: ""
 
         setContent {
             DiveTheme(
@@ -56,10 +61,13 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     MainScreen(
                         paddingValues = innerPadding,
-                        userId = userId ?: "",
-                        userPassword = userPassword ?: "",
-                        userNickname = userNickname ?: "",
-                        userAlcohol = userAlcohol ?: ""
+                        userId = userId,
+                        userPassword = userPassword,
+                        userNickname = userNickname,
+                        userAlcohol = userAlcohol,
+                        onLogOutClick = {
+                            finish()
+                        }
                     )
                 }
             }
@@ -73,8 +81,11 @@ fun MainScreen(
     userId: String,
     userPassword: String,
     userNickname: String,
-    userAlcohol: String
+    userAlcohol: String,
+    onLogOutClick: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -137,6 +148,18 @@ fun MainScreen(
         UserInfoHolder(
             label = "주량",
             info = userAlcohol
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        DiveSoptButton(
+            text = "로그아웃",
+            onClickButton = {
+                scope.launch {
+                    AuthManager.clearUserCredentials()
+                }
+                onLogOutClick()
+            }
         )
     }
 }
