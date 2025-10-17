@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.component.FormField
@@ -60,8 +61,6 @@ class SignUpActivity : ComponentActivity() {
             DiveTheme(
                 darkTheme = false
             ) {
-                val scope = rememberCoroutineScope()
-
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -76,7 +75,7 @@ class SignUpActivity : ComponentActivity() {
                                 putExtra("USER_ALCOHOL", alcoholText)
                             }
 
-                            scope.launch {
+                            lifecycleScope.launch {
                                 AuthManager.saveUserCredentials(
                                     id = idText,
                                     password = passwordText,

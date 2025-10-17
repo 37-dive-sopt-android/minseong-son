@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.theme.DiveTheme
@@ -66,6 +67,9 @@ class MainActivity : ComponentActivity() {
                         userNickname = userNickname,
                         userAlcohol = userAlcohol,
                         onLogOutClick = {
+                            lifecycleScope.launch {
+                                AuthManager.clearUserCredentials()
+                            }
                             finish()
                         }
                     )
@@ -84,8 +88,6 @@ fun MainScreen(
     userAlcohol: String,
     onLogOutClick: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -155,9 +157,6 @@ fun MainScreen(
         DiveSoptButton(
             text = "로그아웃",
             onClickButton = {
-                scope.launch {
-                    AuthManager.clearUserCredentials()
-                }
                 onLogOutClick()
             }
         )
