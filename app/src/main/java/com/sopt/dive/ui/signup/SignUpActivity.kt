@@ -16,28 +16,37 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.component.FormField
 import com.sopt.dive.core.designsystem.theme.DiveTheme
 import com.sopt.dive.core.extension.advancedImePadding
+import com.sopt.dive.core.util.IdInputTransformation
+import com.sopt.dive.core.util.NicknameInputTransformation
+import com.sopt.dive.core.util.PasswordInputTransformation
+import com.sopt.dive.core.util.PasswordOutputTransformation
 import com.sopt.dive.data.remote.AuthManager
 import com.sopt.dive.ui.signin.SignInActivity
 import com.sopt.dive.ui.signup.util.validateSignUpForm
@@ -93,14 +102,9 @@ fun SignUpRoute(
     onSignUpClick: (String, String, String, String) -> Unit
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
-    // Todo : 데이터 클래스로 묶기
-    val idFocusRequester = remember { FocusRequester() }
-    val passwordFocusRequester = remember { FocusRequester() }
-    val nicknameFocusRequester = remember { FocusRequester() }
-    val alcoholFocusRequester = remember { FocusRequester() }
-
-    var isVisible by rememberSaveable { mutableStateOf(false) }
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     val idText = rememberTextFieldState("")
 
@@ -112,16 +116,13 @@ fun SignUpRoute(
 
     SignUpScreen(
         paddingValues = paddingValues,
-        idFocusRequester = idFocusRequester,
-        passwordFocusRequester = passwordFocusRequester,
-        nicknameFocusRequester = nicknameFocusRequester,
-        alcoholFocusRequester = alcoholFocusRequester,
+        focusManager = focusManager,
 
         idText = idText,
         passwordText = passwordText,
         nicknameText = nicknameText,
         alcoholText = alcoholText,
-        isVisible = isVisible,
+        isPasswordVisible = isPasswordVisible,
         onSignUpClick = {
             val isFormValid = validateSignUpForm(
                 context = context,
@@ -140,7 +141,7 @@ fun SignUpRoute(
             }
         },
         onVisibilityChange = {
-            isVisible = !isVisible
+            isPasswordVisible = !isPasswordVisible
         }
     )
 }
@@ -148,16 +149,13 @@ fun SignUpRoute(
 @Composable
 fun SignUpScreen(
     paddingValues: PaddingValues,
-    idFocusRequester: FocusRequester,
-    passwordFocusRequester: FocusRequester,
-    nicknameFocusRequester: FocusRequester,
-    alcoholFocusRequester: FocusRequester,
+    focusManager: FocusManager,
 
     idText: TextFieldState,
     passwordText: TextFieldState,
     nicknameText: TextFieldState,
     alcoholText: TextFieldState,
-    isVisible: Boolean,
+    isPasswordVisible: Boolean,
 
     onVisibilityChange: () -> Unit,
     onSignUpClick: () -> Unit
@@ -179,28 +177,40 @@ fun SignUpScreen(
         )
 
         FormField(
-            label = "ID",
             state = idText,
+            label = "ID",
             placeholder = "아이디를 입력해주세요",
-            modifier = Modifier
-                .focusRequester(idFocusRequester),
             imeAction = ImeAction.Next,
-            onImeActionPerformed = {
-                passwordFocusRequester.requestFocus()
-            }
+            onImeAction = {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            inputTransformation = IdInputTransformation
         )
 
         FormField(
-            label = "PASSWORD",
             state = passwordText,
+            label = "PASSWORD",
             placeholder = "비밀번호를 입력해주세요",
-            isVisible = isVisible,
-            onVisibilityChange = onVisibilityChange,
             imeAction = ImeAction.Next,
-            modifier = Modifier
-                .focusRequester(passwordFocusRequester),
-            onImeActionPerformed = {
-                nicknameFocusRequester.requestFocus()
+            modifier = Modifier,
+            inputTransformation = PasswordInputTransformation,
+            outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
+            onImeAction = {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            trailingIcon = {
+                IconButton(onClick = onVisibilityChange) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(
+                            id = if (isPasswordVisible) {
+                                R.drawable.ic_signin_eye_on
+                            } else {
+                                R.drawable.ic_signin_eye_off
+                            }
+                        ),
+                        contentDescription = "비밀번호 보이기"
+                    )
+                }
             }
         )
 
@@ -209,11 +219,11 @@ fun SignUpScreen(
             state = nicknameText,
             placeholder = "닉네임을 다시 입력해주세요",
             imeAction = ImeAction.Next,
-            modifier = Modifier
-                .focusRequester(nicknameFocusRequester),
-            onImeActionPerformed = {
-                alcoholFocusRequester.requestFocus()
-            }
+            modifier = Modifier,
+            inputTransformation = NicknameInputTransformation,
+            onImeAction = {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
         )
 
         FormField(
@@ -221,8 +231,10 @@ fun SignUpScreen(
             state = alcoholText,
             placeholder = "주량을 입력해주세요",
             imeAction = ImeAction.Done,
-            modifier = Modifier
-                .focusRequester(alcoholFocusRequester)
+            modifier = Modifier,
+            onImeAction = {
+                focusManager.clearFocus()
+            }
         )
 
         Spacer(modifier = Modifier.weight(1f))

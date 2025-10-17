@@ -16,29 +16,37 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.component.FormField
 import com.sopt.dive.core.designsystem.theme.DiveTheme
 import com.sopt.dive.core.extension.advancedImePadding
 import com.sopt.dive.core.extension.noRippleClickable
+import com.sopt.dive.core.util.IdInputTransformation
+import com.sopt.dive.core.util.PasswordInputTransformation
+import com.sopt.dive.core.util.PasswordOutputTransformation
 import com.sopt.dive.data.remote.AuthManager
 import com.sopt.dive.ui.main.MainActivity
 import com.sopt.dive.ui.signup.SignUpActivity
@@ -80,9 +88,15 @@ class SignInActivity : ComponentActivity() {
                         paddingValues = innerPadding,
                         onSignInClick = { loginId, loginPassword ->
                             if ((signUpId == loginId && signUpId.isNotBlank()) && (signUpPassword == loginPassword && signUpPassword.isNotBlank())) {
-                                navigateToMain(signUpId, signUpPassword, signUpNickname, signUpAlcohol)
+                                navigateToMain(
+                                    signUpId,
+                                    signUpPassword,
+                                    signUpNickname,
+                                    signUpAlcohol
+                                )
                             } else {
-                                Toast.makeText(this, "아이디와 비밀번호를 다시 확인해주세요", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "아이디와 비밀번호를 다시 확인해주세요", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         },
                         onSignUpClick = {
@@ -126,10 +140,9 @@ fun SignInRoute(
     onSignInClick: (String, String) -> Unit,
     onSignUpClick: () -> Unit
 ) {
-    val idFocusRequester = remember { FocusRequester() }
-    val passwordFocusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
-    var isVisible by rememberSaveable { mutableStateOf(false) }
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     val idText = rememberTextFieldState("")
 
@@ -137,13 +150,12 @@ fun SignInRoute(
 
     SignInScreen(
         paddingValues = paddingValues,
-        idFocusRequester = idFocusRequester,
-        passwordFocusRequester = passwordFocusRequester,
+        focusManager = focusManager,
         idText = idText,
         passwordText = passwordText,
-        isVisible = isVisible,
+        isPasswordVisible = isPasswordVisible,
         onVisibilityChange = {
-            isVisible = !isVisible
+            isPasswordVisible = !isPasswordVisible
         },
         onSignInClick = {
             onSignInClick(idText.text.toString(), passwordText.text.toString())
@@ -155,11 +167,11 @@ fun SignInRoute(
 @Composable
 fun SignInScreen(
     paddingValues: PaddingValues,
-    idFocusRequester: FocusRequester,
-    passwordFocusRequester: FocusRequester,
+    focusManager: FocusManager,
+
     idText: TextFieldState,
     passwordText: TextFieldState,
-    isVisible: Boolean,
+    isPasswordVisible: Boolean,
 
     onVisibilityChange: () -> Unit,
     onSignInClick: () -> Unit,
@@ -184,11 +196,11 @@ fun SignInScreen(
             state = idText,
             placeholder = "아이디를 입력해주세요",
             imeAction = ImeAction.Next,
-            modifier = Modifier
-                .focusRequester(idFocusRequester),
-            onImeActionPerformed = {
-                passwordFocusRequester.requestFocus()
-            }
+            modifier = Modifier,
+            inputTransformation = IdInputTransformation,
+            onImeAction = {
+                focusManager.moveFocus(FocusDirection.Down)
+            },
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -197,11 +209,27 @@ fun SignInScreen(
             label = "PASSWORD",
             placeholder = "비밀번호를 입력해주세요",
             state = passwordText,
-            isVisible = isVisible,
-            onVisibilityChange = onVisibilityChange,
-            modifier = Modifier
-                .focusRequester(passwordFocusRequester),
+            inputTransformation = PasswordInputTransformation,
+            outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
+            modifier = Modifier,
             imeAction = ImeAction.Done,
+            onImeAction = {
+                focusManager.clearFocus()
+            },
+            trailingIcon = {
+                IconButton(onClick = onVisibilityChange) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(
+                            id = if (isPasswordVisible) {
+                                R.drawable.ic_signin_eye_on
+                            } else {
+                                R.drawable.ic_signin_eye_off
+                            }
+                        ),
+                        contentDescription = "비밀번호 보이기"
+                    )
+                }
+            }
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -231,11 +259,10 @@ private fun SignInScreenPreview() {
             paddingValues = PaddingValues(),
             idText = rememberTextFieldState(""),
             passwordText = rememberTextFieldState(""),
-            idFocusRequester = remember { FocusRequester() },
-            passwordFocusRequester = remember { FocusRequester() },
             onSignInClick = {},
             onSignUpClick = {},
-            isVisible = true,
+            focusManager = LocalFocusManager.current,
+            isPasswordVisible = false,
             onVisibilityChange = {}
         )
     }

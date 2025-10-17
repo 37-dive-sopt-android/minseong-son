@@ -16,26 +16,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.theme.DiveTheme
+
 @Composable
 fun DiveSoptTextField(
     state: TextFieldState,
     placeholder : String,
     inputTransformation: InputTransformation?,
     outputTransformation: OutputTransformation?,
-    onImeActionPerformed: () -> Unit,
     modifier: Modifier = Modifier,
     imeAction: ImeAction = ImeAction.Next,
+    onImeAction: () -> Unit = {},
     trailingIcon : @Composable (() -> Unit)? = null
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     val colorBrush = remember {
         Brush.linearGradient(
             colors = listOf(
@@ -57,13 +55,7 @@ fun DiveSoptTextField(
         inputTransformation = inputTransformation,
         outputTransformation = outputTransformation,
         keyboardOptions = KeyboardOptions(imeAction = imeAction),
-        onKeyboardAction = {
-            if (imeAction == ImeAction.Done) {
-                keyboardController?.hide()
-            } else {
-                onImeActionPerformed()
-            }
-        },
+        onKeyboardAction = { onImeAction() },
         textStyle = TextStyle(
             brush = colorBrush
         ),
@@ -85,7 +77,6 @@ private fun DiveSoptTextFieldPreview() {
             inputTransformation = null,
             outputTransformation = null,
             placeholder ="아이디 입력해주세요",
-            onImeActionPerformed = {},
             trailingIcon = {
                 IconButton(onClick = {}) {
                     Icon(
