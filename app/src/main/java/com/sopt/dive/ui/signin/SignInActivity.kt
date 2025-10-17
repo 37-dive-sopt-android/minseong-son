@@ -154,7 +154,6 @@ fun SignInRoute(
 
     SignInScreen(
         paddingValues = paddingValues,
-        focusManager = focusManager,
         idText = idText,
         passwordText = passwordText,
         isPasswordVisible = isPasswordVisible,
