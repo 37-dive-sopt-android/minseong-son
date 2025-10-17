@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -17,14 +18,69 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 
-fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
+
+@Composable
+fun Modifier.noRippleClickable(
+    onClick: () -> Unit
+): Modifier = composed {
     this.clickable(
+        interactionSource = remember { MutableInteractionSource() },
         indication = null,
-        interactionSource = remember { MutableInteractionSource() }
-    ) {
-        onClick()
+        onClick = onClick
+    )
+}
+// 극한의 성능 최적화 시
+/*
+fun Modifier.noRippleClickable(
+    enabled: Boolean = true,
+    onClick: () -> Unit
+): Modifier = this then NoRippleClickableElement(enabled, onClick)
+
+private data class NoRippleClickableElement(
+    val enabled: Boolean,
+    val onClick: () -> Unit
+) : ModifierNodeElement<NoRippleClickableNode>() {
+    override fun create() = NoRippleClickableNode(enabled, onClick)
+
+    override fun update(node: NoRippleClickableNode) {
+        node.enabled = enabled
+        node.onClick = onClick
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "noRippleClickable"
+        properties["enabled"] = enabled
+        properties["onClick"] = onClick
     }
 }
+
+private class NoRippleClickableNode(
+    var enabled: Boolean,
+    var onClick: () -> Unit
+) : PointerInputModifierNode, Modifier.Node() {
+
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
+        pass: PointerEventPass,
+        bounds: IntSize
+    ) {
+        if (!enabled) return
+
+        if (pass == PointerEventPass.Initial) {
+            pointerEvent.changes.forEach { change ->
+                if (change.changedToUp()) {
+                    onClick()
+                    change.consume()
+                }
+            }
+        }
+    }
+
+    override fun onCancelPointerInput() {
+        // Handle cancellation if needed
+    }
+}
+*/
 
 @SuppressLint("AutoboxingStateCreation")
 fun Modifier.advancedImePadding() = composed {
