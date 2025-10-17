@@ -69,10 +69,10 @@ class SignInActivity : ComponentActivity() {
         ) { result ->
             if (result.resultCode == RESULT_OK) {
                 val data: Intent? = result.data
-                signUpId = data?.getStringExtra("USER_ID") ?: ""
-                signUpPassword = data?.getStringExtra("USER_PASSWORD") ?: ""
-                signUpNickname = data?.getStringExtra("USER_NICKNAME") ?: ""
-                signUpAlcohol = data?.getStringExtra("USER_ALCOHOL") ?: ""
+                signUpId = data?.getStringExtra("USER_ID").orEmpty()
+                signUpPassword = data?.getStringExtra("USER_PASSWORD").orEmpty()
+                signUpNickname = data?.getStringExtra("USER_NICKNAME").orEmpty()
+                signUpAlcohol = data?.getStringExtra("USER_ALCOHOL").orEmpty()
             }
         }
 
@@ -121,6 +121,10 @@ class SignInActivity : ComponentActivity() {
     }
 
     private fun tryAutoLogin() {
+        if (AuthManager.getSavedId().isBlank()) {
+            return
+        }
+
         val saveUserId = AuthManager.getSavedId().takeIf { it.isNotBlank() }
         val saveUserPassword = AuthManager.getSavedPassword().takeIf { it.isNotBlank() }
         val saveUserNickname = AuthManager.getSavedNickname().takeIf { it.isNotBlank() }
@@ -160,6 +164,12 @@ fun SignInRoute(
         onSignInClick = {
             onSignInClick(idText.text.toString(), passwordText.text.toString())
         },
+        moveFocus = {
+            focusManager.moveFocus(it)
+        },
+        clearFocus = {
+            focusManager.clearFocus()
+        },
         onSignUpClick = onSignUpClick
     )
 }
@@ -167,12 +177,13 @@ fun SignInRoute(
 @Composable
 fun SignInScreen(
     paddingValues: PaddingValues,
-    focusManager: FocusManager,
 
     idText: TextFieldState,
     passwordText: TextFieldState,
     isPasswordVisible: Boolean,
 
+    moveFocus: (FocusDirection) -> Unit,
+    clearFocus: () -> Unit,
     onVisibilityChange: () -> Unit,
     onSignInClick: () -> Unit,
     onSignUpClick: () -> Unit
@@ -199,7 +210,7 @@ fun SignInScreen(
             modifier = Modifier,
             inputTransformation = IdInputTransformation,
             onImeAction = {
-                focusManager.moveFocus(FocusDirection.Down)
+                moveFocus(FocusDirection.Down)
             },
         )
 
@@ -213,9 +224,7 @@ fun SignInScreen(
             outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
             modifier = Modifier,
             imeAction = ImeAction.Done,
-            onImeAction = {
-                focusManager.clearFocus()
-            },
+            onImeAction = clearFocus,
             trailingIcon = {
                 IconButton(onClick = onVisibilityChange) {
                     Icon(
@@ -261,9 +270,10 @@ private fun SignInScreenPreview() {
             passwordText = rememberTextFieldState(""),
             onSignInClick = {},
             onSignUpClick = {},
-            focusManager = LocalFocusManager.current,
             isPasswordVisible = false,
-            onVisibilityChange = {}
+            onVisibilityChange = {},
+            moveFocus = {},
+            clearFocus = {}
         )
     }
 }

@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -114,7 +113,6 @@ fun SignUpRoute(
 
     SignUpScreen(
         paddingValues = paddingValues,
-        focusManager = focusManager,
 
         idText = idText,
         passwordText = passwordText,
@@ -140,6 +138,12 @@ fun SignUpRoute(
         },
         onVisibilityChange = {
             isPasswordVisible = !isPasswordVisible
+        },
+        moveFocus = {
+            focusManager.moveFocus(it)
+        },
+        clearFocus = {
+            focusManager.clearFocus()
         }
     )
 }
@@ -147,7 +151,6 @@ fun SignUpRoute(
 @Composable
 fun SignUpScreen(
     paddingValues: PaddingValues,
-    focusManager: FocusManager,
 
     idText: TextFieldState,
     passwordText: TextFieldState,
@@ -155,6 +158,8 @@ fun SignUpScreen(
     alcoholText: TextFieldState,
     isPasswordVisible: Boolean,
 
+    moveFocus: (FocusDirection) -> Unit,
+    clearFocus: () -> Unit,
     onVisibilityChange: () -> Unit,
     onSignUpClick: () -> Unit
 ) {
@@ -180,7 +185,7 @@ fun SignUpScreen(
             placeholder = "아이디를 입력해주세요",
             imeAction = ImeAction.Next,
             onImeAction = {
-                focusManager.moveFocus(FocusDirection.Down)
+                moveFocus(FocusDirection.Down)
             },
             inputTransformation = IdInputTransformation
         )
@@ -192,9 +197,9 @@ fun SignUpScreen(
             imeAction = ImeAction.Next,
             modifier = Modifier,
             inputTransformation = PasswordInputTransformation,
-            outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
+            outputTransformation = PasswordOutputTransformation,
             onImeAction = {
-                focusManager.moveFocus(FocusDirection.Down)
+                moveFocus(FocusDirection.Down)
             },
             trailingIcon = {
                 IconButton(onClick = onVisibilityChange) {
@@ -220,7 +225,7 @@ fun SignUpScreen(
             modifier = Modifier,
             inputTransformation = NicknameInputTransformation,
             onImeAction = {
-                focusManager.moveFocus(FocusDirection.Down)
+                moveFocus(FocusDirection.Down)
             },
         )
 
@@ -230,9 +235,7 @@ fun SignUpScreen(
             placeholder = "주량을 입력해주세요",
             imeAction = ImeAction.Done,
             modifier = Modifier,
-            onImeAction = {
-                focusManager.clearFocus()
-            }
+            onImeAction = clearFocus
         )
 
         Spacer(modifier = Modifier.weight(1f))

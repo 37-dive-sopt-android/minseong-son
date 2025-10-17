@@ -14,10 +14,21 @@ object AuthManager {
 
     private lateinit var appContext: Context
 
+    private val isInitialized: Boolean
+        get() = ::appContext.isInitialized
+
     fun init(context: Context) {
         appContext = context.applicationContext
     }
+
+    private fun checkInitialized() {
+        if (!isInitialized) {
+            throw IllegalStateException("아직 초기화 되지 않았어요! init을 호출해주세요")
+        }
+    }
+
     private val prefs: SharedPreferences by lazy {
+        checkInitialized()
         appContext.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
     }
 
