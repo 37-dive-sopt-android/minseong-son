@@ -1,4 +1,4 @@
-package com.sopt.dive.ui.signup.util
+package com.sopt.dive.presentation.signup.util
 
 import android.content.Context
 import android.widget.Toast

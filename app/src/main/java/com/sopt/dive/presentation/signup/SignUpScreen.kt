@@ -1,11 +1,6 @@
-package com.sopt.dive.ui.signup
+package com.sopt.dive.presentation.signup
 
-import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,11 +13,11 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,115 +31,66 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.component.FormField
-import com.sopt.dive.core.designsystem.theme.DiveTheme
 import com.sopt.dive.core.extension.advancedImePadding
 import com.sopt.dive.core.util.IdInputTransformation
 import com.sopt.dive.core.util.NicknameInputTransformation
 import com.sopt.dive.core.util.PasswordInputTransformation
 import com.sopt.dive.core.util.PasswordOutputTransformation
 import com.sopt.dive.data.remote.AuthManager
-import com.sopt.dive.ui.signin.SignInActivity
-import com.sopt.dive.ui.signup.util.validateSignUpForm
+import com.sopt.dive.presentation.signup.util.validateSignUpForm
 import kotlinx.coroutines.launch
-
-class SignUpActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            DiveTheme(
-                darkTheme = false
-            ) {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                ) { innerPadding ->
-                    SignUpRoute(
-                        paddingValues = innerPadding,
-                        onSignUpClick = { idText, passwordText, nicknameText, alcoholText ->
-                            val intent = Intent(this@SignUpActivity, SignInActivity::class.java).apply {
-                                putExtra("USER_ID", idText)
-                                putExtra("USER_PASSWORD", passwordText)
-                                putExtra("USER_NICKNAME", nicknameText)
-                                putExtra("USER_ALCOHOL", alcoholText)
-                            }
-
-                            lifecycleScope.launch {
-                                AuthManager.saveUserCredentials(
-                                    id = idText,
-                                    password = passwordText,
-                                    nickname = nicknameText,
-                                    alcohol = alcoholText
-                                )
-                            }
-
-                            Toast.makeText(this, "솝트에 온걸 환영해요", Toast.LENGTH_SHORT).show()
-                            setResult(RESULT_OK, intent)
-                            finish()
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun SignUpRoute(
     paddingValues: PaddingValues,
-    onSignUpClick: (String, String, String, String) -> Unit
+    onSignUpSuccess: () -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
-    val idText = rememberTextFieldState("")
-
-    val passwordText = rememberTextFieldState("")
-
-    val nicknameText = rememberTextFieldState("")
-
-    val alcoholText = rememberTextFieldState("")
+    val idText = rememberTextFieldState()
+    val passwordText = rememberTextFieldState()
+    val nicknameText = rememberTextFieldState()
+    val alcoholText = rememberTextFieldState()
 
     SignUpScreen(
         paddingValues = paddingValues,
-
         idText = idText,
         passwordText = passwordText,
         nicknameText = nicknameText,
         alcoholText = alcoholText,
         isPasswordVisible = isPasswordVisible,
+        onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
         onSignUpClick = {
-            val isFormValid = validateSignUpForm(
+            val isValid = validateSignUpForm(
                 context = context,
                 idText = idText.text.toString(),
                 passwordText = passwordText.text.toString(),
                 nicknameText = nicknameText.text.toString()
             )
 
-            if (isFormValid) {
-                onSignUpClick(
-                    idText.text.toString(),
-                    passwordText.text.toString(),
-                    nicknameText.text.toString(),
-                    alcoholText.text.toString()
-                )
+            if (isValid) {
+                scope.launch {
+                    AuthManager.saveUserCredentials(
+                        id = idText.text.toString(),
+                        password = passwordText.text.toString(),
+                        nickname = nicknameText.text.toString(),
+                        alcohol = alcoholText.text.toString()
+                    )
+                }
+
+                Toast.makeText(context, "솝트에 온 걸 환영해요!", Toast.LENGTH_SHORT).show()
+                onSignUpSuccess()
             }
         },
-        onVisibilityChange = {
-            isPasswordVisible = !isPasswordVisible
-        },
-        moveFocus = {
-            focusManager.moveFocus(it)
-        },
-        clearFocus = {
-            focusManager.clearFocus()
-        }
+        moveFocus = { focusManager.moveFocus(it) },
+        clearFocus = { focusManager.clearFocus() }
     )
 }
 
@@ -197,7 +143,7 @@ fun SignUpScreen(
             imeAction = ImeAction.Next,
             modifier = Modifier,
             inputTransformation = PasswordInputTransformation,
-            outputTransformation = PasswordOutputTransformation,
+            outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
             onImeAction = {
                 moveFocus(FocusDirection.Down)
             },
