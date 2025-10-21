@@ -8,15 +8,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,7 +28,9 @@ import com.sopt.dive.core.designsystem.component.DiveSoptItem
 import com.sopt.dive.core.designsystem.component.DiveSoptTextField
 import com.sopt.dive.presentation.search.model.SearchModel
 import com.sopt.dive.presentation.search.state.SearchState
+import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -36,8 +42,9 @@ fun SearchRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit
 ) {
-    val searchQuery = rememberTextFieldState()
+    val focusManager = LocalFocusManager.current
 
+    val searchQuery = rememberTextFieldState()
     val dummyData = remember {
         persistentListOf(
             SearchModel(1, "퇴"),
@@ -56,8 +63,22 @@ fun SearchRoute(
             SearchModel(14, "한"),
             SearchModel(15, "민"),
             SearchModel(16, "재"),
-            SearchModel(17, "짱")
+            SearchModel(17, "짱"),
+            SearchModel(18, "손"),
+            SearchModel(19, "주"),
+            SearchModel(20, "완"),
+            SearchModel(21, "짱")
         )
+    }
+
+    var flippedIndices by remember { mutableStateOf(persistentSetOf<Int>()) }
+
+    val onFlipToggle: (Int) -> Unit = { index ->
+        flippedIndices = if (flippedIndices.contains(index)) {
+            flippedIndices.remove(index)
+        } else {
+            flippedIndices.add(index)
+        }
     }
 
     val uiState by remember(dummyData) {
@@ -80,6 +101,11 @@ fun SearchRoute(
         paddingValues = paddingValues,
         searchQuery = searchQuery,
         uiState = uiState,
+        flippedIndices = flippedIndices,
+        onFlipToggle = onFlipToggle,
+        onImeAction = {
+            focusManager.clearFocus()
+        }
     )
 }
 
@@ -87,7 +113,10 @@ fun SearchRoute(
 fun SearchScreen(
     paddingValues: PaddingValues,
     searchQuery: TextFieldState,
-    uiState: SearchState
+    uiState: SearchState,
+    flippedIndices: PersistentSet<Int>,
+    onFlipToggle: (Int) -> Unit,
+    onImeAction: () -> Unit
 ) {
     Column (
         modifier = Modifier
@@ -102,9 +131,8 @@ fun SearchScreen(
                 .padding(16.dp),
             imeAction = ImeAction.Done,
             onImeAction = {
-                searchQuery.edit {
-                    ""
-                }
+                onImeAction()
+                searchQuery.clearText()
             }
         )
 
@@ -116,12 +144,18 @@ fun SearchScreen(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            items(
+            itemsIndexed(
                 items = uiState.searchData,
-                key = { item -> item.id }
-            ) { item ->
+            ) { index, item ->
+
+                val isFlipped = flippedIndices.contains(index)
+
                 DiveSoptItem(
-                    data = item.text
+                    data = item.text,
+                    isFlipped = isFlipped,
+                    onFlip = {
+                        onFlipToggle(index)
+                    }
                 )
             }
         }

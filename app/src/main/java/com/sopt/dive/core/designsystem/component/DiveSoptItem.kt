@@ -12,9 +12,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -27,10 +24,10 @@ import com.sopt.dive.core.designsystem.theme.DiveTheme
 @Composable
 fun DiveSoptItem(
     data: String,
+    isFlipped: Boolean,
+    onFlip: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isFlipped by remember { mutableStateOf(false) }
-
     val rotationY by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
         label = "rotationY",
@@ -44,7 +41,7 @@ fun DiveSoptItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { isFlipped = !isFlipped }
+            .clickable(onClick = onFlip)
             .graphicsLayer {
                 this.rotationY = rotationY
                 cameraDistance = 12f * density
@@ -81,7 +78,9 @@ fun DiveSoptItem(
 private fun DiveSoptItemPreview() {
     DiveTheme {
         DiveSoptItem(
-            data = "sopt"
+            data = "sopt",
+            isFlipped = false,
+            onFlip = {}
         )
     }
 }
