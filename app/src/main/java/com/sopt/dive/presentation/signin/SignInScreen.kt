@@ -61,13 +61,6 @@ fun SignInRoute(
     val savedId by remember { mutableStateOf(AuthManager.getSavedId()) }
     val savedPw by remember { mutableStateOf(AuthManager.getSavedPassword()) }
 
-    LaunchedEffect(Unit) {
-        if (savedId.isNotBlank() && savedPw.isNotBlank()) {
-            Toast.makeText(context, "자동 로그인되었습니다", Toast.LENGTH_SHORT).show()
-            onSignInClick()
-        }
-    }
-
     SignInScreen(
         paddingValues = paddingValues,
         idText = idText,

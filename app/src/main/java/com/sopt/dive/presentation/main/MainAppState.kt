@@ -12,9 +12,9 @@ import androidx.navigation.navOptions
 import com.sopt.dive.presentation.home.navigation.navigateHome
 import com.sopt.dive.presentation.mypage.navigation.navigateMyPage
 import com.sopt.dive.presentation.search.navigation.navigateSearch
-import com.sopt.dive.presentation.signin.navigation.SignIn
 import com.sopt.dive.presentation.signin.navigation.navigateSignIn
 import com.sopt.dive.presentation.signup.navigation.navigateSignUp
+import com.sopt.dive.presentation.splash.navigation.Splash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +26,7 @@ class MainAppState(
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
 ) {
-    val startDestination = SignIn
+    val startDestination = Splash
 
     // 1. NavController의 Flow를 관찰하여 현재 Destination을 StateFlow로 변환, 초기값은 Splash
     private val currentDestination = navController.currentBackStackEntryFlow
