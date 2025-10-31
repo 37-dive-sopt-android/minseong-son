@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sopt.dive.core.designsystem.component.DiveSoptItem
 import com.sopt.dive.core.designsystem.component.DiveSoptTextField
 import com.sopt.dive.presentation.search.model.SearchModel
+import com.sopt.dive.presentation.search.model.SearchType
 import com.sopt.dive.presentation.search.state.SearchState
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
@@ -47,27 +49,15 @@ fun SearchRoute(
     val searchQuery = rememberTextFieldState()
     val dummyData = remember {
         persistentListOf(
-            SearchModel(1, "퇴"),
-            SearchModel(2, "근"),
-            SearchModel(3, "하"),
-            SearchModel(4, "고"),
-            SearchModel(5, "싶"),
-            SearchModel(6, "다"),
-            SearchModel(7, "살"),
-            SearchModel(8, "려"),
-            SearchModel(9, "줘"),
-            SearchModel(10, "박"),
-            SearchModel(11, "동"),
-            SearchModel(12, "민"),
-            SearchModel(13, "짱"),
-            SearchModel(14, "한"),
-            SearchModel(15, "민"),
-            SearchModel(16, "재"),
-            SearchModel(17, "짱"),
-            SearchModel(18, "손"),
-            SearchModel(19, "주"),
-            SearchModel(20, "완"),
-            SearchModel(21, "짱")
+            SearchModel(1, "박동민 사랑해", SearchType.BIRTHDAY),
+            SearchModel(2, "퇴근하고 싶다 🎵", SearchType.PROFILE_MUSIC),
+            SearchModel(3, "살려줘", SearchType.STATUS_MESSAGE),
+            SearchModel(4, "민재햄 생일", SearchType.BIRTHDAY),
+            SearchModel(5, "짱", SearchType.NORMAL),
+            SearchModel(6, "오늘도 화이팅!", SearchType.STATUS_MESSAGE),
+            SearchModel(7, "나의 프로필 뮤직: IU - Blueming", SearchType.PROFILE_MUSIC),
+            SearchModel(8, "10월 31일 🎃🎃🎃", SearchType.FESTIVAL),
+            SearchModel(9, "4월 12일 🎂", SearchType.BIRTHDAY)
         )
     }
 
@@ -153,9 +143,12 @@ fun SearchScreen(
                 DiveSoptItem(
                     data = item.text,
                     isFlipped = isFlipped,
+                    textColor = item.textColor,
                     onFlip = {
                         onFlipToggle(index)
-                    }
+                    },
+                    // 이런 방식도 존재해요
+                    backgroundColor = if (SearchType.fromLabel("한줄 소개") == item.type) Color.Cyan else Color.Magenta
                 )
             }
         }

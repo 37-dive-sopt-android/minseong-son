@@ -4,6 +4,7 @@ package com.sopt.dive.core.designsystem.component
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,7 +28,9 @@ fun DiveSoptItem(
     data: String,
     isFlipped: Boolean,
     onFlip: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textColor: Color = Color.Black,
+    backgroundColor: Color = Color.White
 ) {
     val rotationY by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
@@ -42,6 +46,7 @@ fun DiveSoptItem(
             .fillMaxWidth()
             .padding(8.dp)
             .clickable(onClick = onFlip)
+            .background(backgroundColor)
             .graphicsLayer {
                 this.rotationY = rotationY
                 cameraDistance = 12f * density
@@ -57,6 +62,7 @@ fun DiveSoptItem(
                 Text(
                     text = data,
                     fontWeight = FontWeight.Bold,
+                    color = textColor,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -66,6 +72,7 @@ fun DiveSoptItem(
                     modifier = Modifier.graphicsLayer {
                         this.rotationY = 180f
                     }.fillMaxWidth(),
+                    color = textColor,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -80,7 +87,8 @@ private fun DiveSoptItemPreview() {
         DiveSoptItem(
             data = "sopt",
             isFlipped = false,
-            onFlip = {}
+            onFlip = {},
+            textColor = Color.Black
         )
     }
 }
