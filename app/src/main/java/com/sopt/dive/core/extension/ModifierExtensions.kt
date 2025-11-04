@@ -82,7 +82,6 @@ private class NoRippleClickableNode(
 }
 */
 
-@SuppressLint("AutoboxingStateCreation")
 fun Modifier.advancedImePadding() = composed {
     var consumePadding by remember { mutableIntStateOf(0) }
     onGloballyPositioned { coordinates ->

@@ -3,4 +3,7 @@
     <string name="title_activity_sign_up">SignUpActivity</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_sign_in">SignInActivity</string>
+    <string name="ic_home_description">Home</string>
+    <string name="ic_search_description">Search</string>
+    <string name="ic_mypage_description">MyPage</string>
 </resources>

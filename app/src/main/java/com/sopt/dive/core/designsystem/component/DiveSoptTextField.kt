@@ -27,9 +27,9 @@ import com.sopt.dive.core.designsystem.theme.DiveTheme
 fun DiveSoptTextField(
     state: TextFieldState,
     placeholder : String,
-    inputTransformation: InputTransformation?,
-    outputTransformation: OutputTransformation?,
     modifier: Modifier = Modifier,
+    inputTransformation: InputTransformation? = null,
+    outputTransformation: OutputTransformation? = null,
     imeAction: ImeAction = ImeAction.Next,
     onImeAction: () -> Unit = {},
     trailingIcon : @Composable (() -> Unit)? = null
