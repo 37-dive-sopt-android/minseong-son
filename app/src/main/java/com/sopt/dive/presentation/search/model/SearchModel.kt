@@ -7,7 +7,8 @@ import androidx.compose.ui.graphics.Color
 data class SearchModel(
     val id: Int,
     val text: String,
-    val type: SearchType = SearchType.NORMAL
+    val type: SearchType,
+    val isFlipped: Boolean = false
 ) {
     val textColor
         get() = when(type) {
@@ -18,3 +19,5 @@ data class SearchModel(
             SearchType.FESTIVAL -> Color.Yellow
         }
 }
+
+fun SearchModel.flip(): SearchModel = copy(isFlipped = !isFlipped)

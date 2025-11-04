@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import com.sopt.dive.core.designsystem.component.DiveSoptItem
 import com.sopt.dive.core.designsystem.component.DiveSoptTextField
 import com.sopt.dive.presentation.search.model.SearchModel
 import com.sopt.dive.presentation.search.model.SearchType
+import com.sopt.dive.presentation.search.model.flip
 import com.sopt.dive.presentation.search.state.SearchState
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
@@ -45,8 +47,8 @@ fun SearchRoute(
     navigateUp: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-
     val searchQuery = rememberTextFieldState()
+
     val dummyData = remember {
         persistentListOf(
             SearchModel(1, "박동민 사랑해", SearchType.BIRTHDAY),
@@ -61,37 +63,42 @@ fun SearchRoute(
         )
     }
 
-    var flippedIndices by remember { mutableStateOf(persistentSetOf<Int>()) }
+    var searchData by remember { mutableStateOf(dummyData) }
 
-    val onFlipToggle: (Int) -> Unit = { index ->
-        flippedIndices = if (flippedIndices.contains(index)) {
-            flippedIndices.remove(index)
-        } else {
-            flippedIndices.add(index)
+    val onFlipToggle: (Int) -> Unit = { id ->
+        val indexInOriginalList = searchData.indexOfFirst { it.id == id }
+        if (indexInOriginalList != -1) {
+            searchData = searchData.set(indexInOriginalList, searchData[indexInOriginalList].flip())
         }
     }
 
-    val uiState by remember(dummyData) {
+    var debouncedQuery by remember { mutableStateOf("") }
+    LaunchedEffect(searchQuery.text) {
         snapshotFlow { searchQuery.text.toString() }
             .debounce(300L)
-            .map { query ->
-                val filteredList = if (query.isBlank()) {
-                    dummyData
+            .collect {
+                debouncedQuery = it
+            }
+    }
+
+    val uiState by remember(debouncedQuery, searchData) {
+        mutableStateOf(
+            SearchState(
+                searchData = if (debouncedQuery.isBlank()) {
+                    searchData
                 } else {
-                    dummyData.filter {
-                        it.text.contains(query, ignoreCase = true)
+                    searchData.filter {
+                        it.text.contains(debouncedQuery, ignoreCase = true)
                     }.toPersistentList()
                 }
-
-                SearchState(searchData = filteredList)
-            }
-    }.collectAsStateWithLifecycle(initialValue = SearchState(searchData = dummyData))
+            )
+        )
+    }
 
     SearchScreen(
         paddingValues = paddingValues,
         searchQuery = searchQuery,
         uiState = uiState,
-        flippedIndices = flippedIndices,
         onFlipToggle = onFlipToggle,
         onImeAction = {
             focusManager.clearFocus()
@@ -104,11 +111,10 @@ fun SearchScreen(
     paddingValues: PaddingValues,
     searchQuery: TextFieldState,
     uiState: SearchState,
-    flippedIndices: PersistentSet<Int>,
     onFlipToggle: (Int) -> Unit,
     onImeAction: () -> Unit
 ) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
@@ -136,19 +142,17 @@ fun SearchScreen(
         ) {
             itemsIndexed(
                 items = uiState.searchData,
+                key = { _, item -> item.id }
             ) { index, item ->
-
-                val isFlipped = flippedIndices.contains(index)
-
                 DiveSoptItem(
                     data = item.text,
-                    isFlipped = isFlipped,
+                    isFlipped = item.isFlipped,
                     textColor = item.textColor,
-                    onFlip = {
-                        onFlipToggle(index)
+                    onClick = {
+                        onFlipToggle(item.id)
                     },
                     // 이런 방식도 존재해요
-                    backgroundColor = if (SearchType.fromLabel("한줄 소개") == item.type) Color.Cyan else Color.Magenta
+                    //backgroundColor = if (SearchType.fromLabel("한줄 소개") == item.type) Color.Cyan else Color.Magenta
                 )
             }
         }
