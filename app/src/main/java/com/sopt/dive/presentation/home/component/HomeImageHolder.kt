@@ -9,7 +9,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -27,8 +30,15 @@ fun HomeImageHolder(
     modifier: Modifier = Modifier
 ) {
     val rotation = remember { Animatable(0f) }
+    var isInitial by remember { mutableStateOf(true) }
 
     LaunchedEffect(isFlipped) {
+        if (isInitial) {
+            isInitial = false
+            rotation.snapTo(if (isFlipped) 180f else 0f)
+            return@LaunchedEffect
+        }
+
         val currentRotation = rotation.value
 
         val currentCycle = floor(currentRotation / 2520f)
