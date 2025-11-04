@@ -1,5 +1,6 @@
 package com.sopt.dive.presentation.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,7 +14,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.core.designsystem.component.DiveSoptItem
+import com.sopt.dive.presentation.home.component.HomeImageHolder
+import com.sopt.dive.presentation.home.state.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
@@ -22,40 +27,22 @@ import kotlinx.collections.immutable.persistentSetOf
 @Composable
 fun HomeRoute(
     paddingValues: PaddingValues,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
 ) {
-    // 물론 리컴포지션 안 일어나지만 이런게 있다 정도
-    val immutableData = remember {
-        persistentListOf(
-            "퇴", "근", "하", "고", "싶", "다", "살", "려", "줘",
-            "박", "동", "민", "짱", "한", "민", "재", "짱", "손",
-            "주", "완", "짱"
-        )
-    }
-
-    var flippedIndices by remember { mutableStateOf(persistentSetOf<Int>()) }
-
-    val onFlipToggle: (Int) -> Unit = { index ->
-        flippedIndices = if (flippedIndices.contains(index)) {
-            flippedIndices.remove(index)
-        } else {
-            flippedIndices.add(index)
-        }
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         paddingValues = paddingValues,
-        data = immutableData,
-        flippedIndices = flippedIndices,
-        onFlipToggle = onFlipToggle
+        uiState = uiState,
+        onFlipToggle = viewModel::toggleFlip
     )
 }
 
 @Composable
 fun HomeScreen(
     paddingValues: PaddingValues,
-    data: ImmutableList<String>,
-    flippedIndices: PersistentSet<Int>,
+    uiState: HomeUiState,
     onFlipToggle: (Int) -> Unit
 ) {
     LazyColumn (
@@ -63,18 +50,18 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(paddingValues),
         contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         itemsIndexed(
-            items = data,
+            items = uiState.data,
+            key = { _, item -> item.id }
         ) { index, item ->
-
-            val isFlipped = flippedIndices.contains(index)
-
-            DiveSoptItem(
-                data = item,
-                isFlipped = isFlipped,
-                onFlip = {
+            HomeImageHolder (
+                frontImageUrl = item.frontImageUrl,
+                backImageUrl = item.backImageUrl,
+                isFlipped = item.isFlipped,
+                onClick = {
                     onFlipToggle(index)
                 }
             )
