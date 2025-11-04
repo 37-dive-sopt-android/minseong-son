@@ -21,24 +21,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sopt.dive.core.designsystem.component.DiveSoptItem
 import com.sopt.dive.core.designsystem.component.DiveSoptTextField
 import com.sopt.dive.presentation.search.model.SearchModel
 import com.sopt.dive.presentation.search.model.SearchType
 import com.sopt.dive.presentation.search.model.flip
 import com.sopt.dive.presentation.search.state.SearchState
-import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
 
 @OptIn(FlowPreview::class)
 @Composable
