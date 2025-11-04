@@ -20,6 +20,9 @@ navigation = "2.9.5"
 lifecycleRuntimeComposeAndroid = "2.9.4"
 runtime = "1.9.3"
 
+# Coil
+coil = "2.7.0"
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -44,6 +47,9 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 
 # Kotlin
 kotlinx-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutable" }
+
+# Coil
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
