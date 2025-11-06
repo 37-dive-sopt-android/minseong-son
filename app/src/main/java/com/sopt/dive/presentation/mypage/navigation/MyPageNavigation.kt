@@ -17,12 +17,14 @@ fun NavController.navigateMyPage(
 
 fun NavGraphBuilder.myPageGraph(
     paddingValues: PaddingValues,
-    navigateSignIn: () -> Unit
+    navigateSignIn: () -> Unit,
+    navigateEasterEgg: () -> Unit
 ) {
     composable<MyPage> {
         MyPageRoute(
             paddingValues = paddingValues,
-            navigateSignIn = navigateSignIn
+            navigateSignIn = navigateSignIn,
+            navigateEasterEgg = navigateEasterEgg
         )
     }
 }
