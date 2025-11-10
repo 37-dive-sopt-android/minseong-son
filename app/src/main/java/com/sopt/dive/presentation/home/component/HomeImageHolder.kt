@@ -3,7 +3,6 @@ package com.sopt.dive.presentation.home.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -19,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.sopt.dive.core.extension.wrapRotation
 import kotlin.math.floor
 
 @Composable
@@ -61,7 +61,7 @@ fun HomeImageHolder(
     Card(
         modifier = modifier
             .graphicsLayer {
-                rotationY = rotation.value % 360f
+                rotationY = rotation.value.wrapRotation()
                 cameraDistance = 12 * density
             },
         onClick = onClick,
@@ -69,13 +69,13 @@ fun HomeImageHolder(
             defaultElevation = 4.dp
         )
     ) {
-        val isBackVisible = (rotation.value % 360f) > 90f && (rotation.value % 360f) < 270f
+        val isBackVisible = (rotation.value.wrapRotation()) > 90f && (rotation.value.wrapRotation()) < 270f
 
         AsyncImage(
             model = if (isBackVisible) backImageUrl else frontImageUrl,
             contentDescription = null,
             modifier = Modifier
-                .size(200.dp, 300.dp)
+                .size(width = 200.dp, height = 300.dp)
                 .graphicsLayer {
                     if (isBackVisible) rotationY = 180f
                 },
