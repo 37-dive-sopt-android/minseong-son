@@ -27,7 +27,7 @@ import com.sopt.dive.core.designsystem.theme.DiveTheme
 fun DiveSoptItem(
     data: String,
     isFlipped: Boolean,
-    onFlip: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     textColor: Color = Color.Black,
     backgroundColor: Color = Color.White
@@ -45,7 +45,7 @@ fun DiveSoptItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable(onClick = onFlip)
+            .clickable(onClick = onClick)
             .background(backgroundColor)
             .graphicsLayer {
                 this.rotationY = rotationY
@@ -69,9 +69,11 @@ fun DiveSoptItem(
             } else {
                 Text(
                     text = "뒤집힌 면",
-                    modifier = Modifier.graphicsLayer {
-                        this.rotationY = 180f
-                    }.fillMaxWidth(),
+                    modifier = Modifier
+                        .graphicsLayer {
+                            this.rotationY = 180f
+                        }
+                        .fillMaxWidth(),
                     color = textColor,
                     textAlign = TextAlign.Center,
                 )
@@ -87,7 +89,7 @@ private fun DiveSoptItemPreview() {
         DiveSoptItem(
             data = "sopt",
             isFlipped = false,
-            onFlip = {},
+            onClick = {},
             textColor = Color.Black
         )
     }

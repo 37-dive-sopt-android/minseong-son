@@ -47,4 +47,5 @@ dependencies {
     implementation(libs.bundles.kotlinx)
 
     debugImplementation(libs.bundles.debug)
+    implementation(libs.coil.compose)
 }

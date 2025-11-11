@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.sopt.dive.presentation.easteregg.navigation.navigateEasterEgg
 import com.sopt.dive.presentation.home.navigation.navigateHome
 import com.sopt.dive.presentation.mypage.navigation.navigateMyPage
 import com.sopt.dive.presentation.search.navigation.navigateSearch
@@ -96,16 +97,22 @@ class MainAppState(
     fun navigateToSignIn() {
         navController.navigateSignIn(clearStackNavOptions)
     }
-
     fun navigateToSignUp(
         navOptions: NavOptions? = null
     ) {
         navController.navigateSignUp(navOptions)
     }
 
+    fun navigateToEasterEgg(
+        navOptions: NavOptions? = null
+    ) {
+        navController.navigateEasterEgg(navOptions)
+    }
+
     fun navigateToClearHome() {
         navController.navigateHome(clearStackNavOptions)
     }
+
 }
 
 @Composable

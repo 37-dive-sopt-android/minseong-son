@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
+import com.sopt.dive.presentation.easteregg.navigation.easterEggGraph
 import com.sopt.dive.presentation.home.navigation.homeGraph
 import com.sopt.dive.presentation.main.component.MainBottomBar
 import com.sopt.dive.presentation.mypage.navigation.myPageGraph
@@ -74,7 +75,6 @@ fun MainScreen(
                 paddingValues = innerPadding,
                 navigateToLogin = appState::navigateToClearHome
             )
-
             homeGraph(
                 paddingValues = innerPadding,
                 navigateUp = appState::navigateUp
@@ -85,7 +85,11 @@ fun MainScreen(
             )
             myPageGraph(
                 paddingValues = innerPadding,
-                navigateSignIn = appState::navigateToSignIn
+                navigateSignIn = appState::navigateToSignIn,
+                navigateEasterEgg = appState::navigateToEasterEgg
+            )
+            easterEggGraph(
+                paddingValues = innerPadding
             )
 
             signInGraph(
