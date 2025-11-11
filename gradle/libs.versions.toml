@@ -23,6 +23,11 @@ runtime = "1.9.3"
 # Coil
 coil = "2.7.0"
 
+# Network
+okhttp = "4.11.0"
+retrofit = "2.11.0"
+retrofitKotlinSerializationConverter = "1.0.0"
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -51,6 +56,14 @@ kotlinx-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collectio
 # Coil
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+# Network
+okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-kotlin-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerializationConverter" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -78,6 +91,16 @@ kotlinx = [
 debug = [
     "androidx-ui-tooling",
     "androidx-ui-test-manifest"
+]
+
+okhttp = [
+    "okhttp",
+    "okhttp-logging-interceptor"
+]
+
+retrofit = [
+    "retrofit",
+    "retrofit-kotlin-serialization-converter"
 ]
 
 test = [
