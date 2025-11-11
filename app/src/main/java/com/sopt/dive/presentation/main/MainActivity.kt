@@ -6,7 +6,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.sopt.dive.core.designsystem.theme.DiveTheme
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.data.local.AuthManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

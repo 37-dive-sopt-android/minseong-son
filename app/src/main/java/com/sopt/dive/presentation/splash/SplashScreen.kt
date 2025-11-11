@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.data.local.AuthManager
 import kotlinx.coroutines.delay
 
 @Composable

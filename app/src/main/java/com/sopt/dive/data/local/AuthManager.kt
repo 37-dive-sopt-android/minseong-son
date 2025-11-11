@@ -1,4 +1,4 @@
-package com.sopt.dive.data.remote
+package com.sopt.dive.data.local
 
 import android.content.Context
 import android.content.SharedPreferences

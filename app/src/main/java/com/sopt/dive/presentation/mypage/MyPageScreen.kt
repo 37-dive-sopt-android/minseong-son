@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.data.local.AuthManager
 import com.sopt.dive.presentation.mypage.component.ProfileImageHolder
 import com.sopt.dive.presentation.mypage.component.UserInfoHolder
 import kotlinx.coroutines.launch
@@ -108,4 +108,3 @@ fun MyPageScreen(
         )
     }
 }
-

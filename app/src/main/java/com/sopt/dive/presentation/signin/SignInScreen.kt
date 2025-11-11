@@ -13,7 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +40,7 @@ import com.sopt.dive.core.extension.noRippleClickable
 import com.sopt.dive.core.util.IdInputTransformation
 import com.sopt.dive.core.util.PasswordInputTransformation
 import com.sopt.dive.core.util.PasswordOutputTransformation
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.data.local.AuthManager
 
 @Composable
 fun SignInRoute(

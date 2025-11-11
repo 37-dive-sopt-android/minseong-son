@@ -39,7 +39,7 @@ import com.sopt.dive.core.util.IdInputTransformation
 import com.sopt.dive.core.util.NicknameInputTransformation
 import com.sopt.dive.core.util.PasswordInputTransformation
 import com.sopt.dive.core.util.PasswordOutputTransformation
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.data.local.AuthManager
 import com.sopt.dive.presentation.signup.util.validateSignUpForm
 import kotlinx.coroutines.launch
 
