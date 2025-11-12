@@ -73,7 +73,8 @@ fun MainScreen(
         ) {
             splashNavGraph(
                 paddingValues = innerPadding,
-                navigateToLogin = appState::navigateToClearHome
+                navigateToLogin = appState::navigateToSignIn,
+                navigateToHome = appState::navigateToClearHome
             )
             homeGraph(
                 paddingValues = innerPadding,
