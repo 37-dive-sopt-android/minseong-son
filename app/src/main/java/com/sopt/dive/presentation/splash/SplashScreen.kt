@@ -17,13 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.sopt.dive.data.local.AuthManager
+import com.sopt.dive.core.localstorage.AuthManager
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashRoute(
     paddingValues: PaddingValues,
-    navigateToLogin: () -> Unit
+    navigateToLogin: () -> Unit,
+    navigateToHome: () -> Unit
 ) {
     val context = LocalContext.current
     val savedId by remember { mutableStateOf(AuthManager.getSavedId()) }
@@ -33,6 +34,8 @@ fun SplashRoute(
         delay(1500)
         if (savedId.isNotBlank() && savedPw.isNotBlank()) {
             Toast.makeText(context, "자동 로그인되었습니다", Toast.LENGTH_SHORT).show()
+            navigateToHome()
+        } else {
             navigateToLogin()
         }
     }
