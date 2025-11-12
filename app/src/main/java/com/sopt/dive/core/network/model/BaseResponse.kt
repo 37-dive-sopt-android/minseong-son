@@ -8,7 +8,7 @@ data class BaseResponse<T>(
     @SerialName("success")
     val success: Boolean,
     @SerialName("code")
-    val code: Int,
+    val code: String,
     @SerialName("message")
     val message: String,
     @SerialName("data")
