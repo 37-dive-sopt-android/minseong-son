@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -50,9 +51,12 @@ import com.sopt.dive.presentation.signin.state.SignInState
 @Composable
 fun SignInRoute(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     onSignInClick: () -> Unit,
     onSignUpClick: () -> Unit,
-    viewModel: SignInViewModel = viewModel()
+    viewModel: SignInViewModel = viewModel(
+        factory = viewModelFactory
+    )
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current

@@ -1,5 +1,6 @@
 package com.sopt.dive.presentation.search
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -8,93 +9,49 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.sopt.dive.core.designsystem.component.DiveSoptItem
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.sopt.dive.core.designsystem.component.DiveSoptTextField
-import com.sopt.dive.presentation.search.model.SearchModel
-import com.sopt.dive.presentation.search.model.SearchType
-import com.sopt.dive.presentation.search.model.flip
+import com.sopt.dive.presentation.search.component.SearchUserItem
+import com.sopt.dive.presentation.search.model.SearchUiModel
 import com.sopt.dive.presentation.search.state.SearchState
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
 
 @OptIn(FlowPreview::class)
 @Composable
 fun SearchRoute(
     paddingValues: PaddingValues,
-    navigateUp: () -> Unit
+    viewModelFactory: ViewModelProvider.Factory,
+    navigateUp: () -> Unit,
+    viewModel: SearchViewModel = viewModel(
+        factory = viewModelFactory
+    )
 ) {
     val focusManager = LocalFocusManager.current
-    val searchQuery = rememberTextFieldState()
 
-    val dummyData = remember {
-        persistentListOf(
-            SearchModel(1, "박동민 사랑해", SearchType.BIRTHDAY),
-            SearchModel(2, "퇴근하고 싶다 🎵", SearchType.PROFILE_MUSIC),
-            SearchModel(3, "살려줘", SearchType.STATUS_MESSAGE),
-            SearchModel(4, "민재햄 생일", SearchType.BIRTHDAY),
-            SearchModel(5, "짱", SearchType.NORMAL),
-            SearchModel(6, "오늘도 화이팅!", SearchType.STATUS_MESSAGE),
-            SearchModel(7, "나의 프로필 뮤직: IU - Blueming", SearchType.PROFILE_MUSIC),
-            SearchModel(8, "10월 31일 🎃🎃🎃", SearchType.FESTIVAL),
-            SearchModel(9, "4월 12일 🎂", SearchType.BIRTHDAY)
-        )
-    }
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val followerList = viewModel.followerPagingData.collectAsLazyPagingItems()
 
-    var searchData by remember { mutableStateOf(dummyData) }
-
-    val onFlipToggle: (Int) -> Unit = { id ->
-        val indexInOriginalList = searchData.indexOfFirst { it.id == id }
-        if (indexInOriginalList != -1) {
-            searchData = searchData.set(indexInOriginalList, searchData[indexInOriginalList].flip())
-        }
-    }
-
-    var debouncedQuery by remember { mutableStateOf("") }
-    LaunchedEffect(searchQuery.text) {
-        snapshotFlow { searchQuery.text.toString() }
-            .debounce(300L)
-            .collect {
-                debouncedQuery = it
-            }
-    }
-
-    val uiState by remember(debouncedQuery, searchData) {
-        mutableStateOf(
-            SearchState(
-                searchData = if (debouncedQuery.isBlank()) {
-                    searchData
-                } else {
-                    searchData.filter {
-                        it.text.contains(debouncedQuery, ignoreCase = true)
-                    }.toPersistentList()
-                }
-            )
-        )
-    }
 
     SearchScreen(
         paddingValues = paddingValues,
-        searchQuery = searchQuery,
         uiState = uiState,
-        onFlipToggle = onFlipToggle,
+        followerList = followerList,
         onImeAction = {
             focusManager.clearFocus()
         }
@@ -104,9 +61,8 @@ fun SearchRoute(
 @Composable
 fun SearchScreen(
     paddingValues: PaddingValues,
-    searchQuery: TextFieldState,
     uiState: SearchState,
-    onFlipToggle: (Int) -> Unit,
+    followerList: LazyPagingItems<SearchUiModel>,
     onImeAction: () -> Unit
 ) {
     Column(
@@ -115,7 +71,7 @@ fun SearchScreen(
             .padding(paddingValues)
     ) {
         DiveSoptTextField(
-            state = searchQuery,
+            state = uiState.searchQuery,
             placeholder = "검색어를 입력해주세요.",
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,7 +79,7 @@ fun SearchScreen(
             imeAction = ImeAction.Done,
             onImeAction = {
                 onImeAction()
-                searchQuery.clearText()
+                uiState.searchQuery.clearText()
             }
         )
 
@@ -135,21 +91,44 @@ fun SearchScreen(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            itemsIndexed(
-                items = uiState.searchData,
-                key = { _, item -> item.id }
-            ) { index, item ->
-                DiveSoptItem(
-                    data = item.text,
-                    isFlipped = item.isFlipped,
-                    textColor = item.textColor,
-                    onClick = {
-                        onFlipToggle(item.id)
-                    },
-                    // 이런 방식도 존재해요
-                    //backgroundColor = if (SearchType.fromLabel("한줄 소개") == item.type) Color.Cyan else Color.Magenta
-                )
+            items(
+                count = followerList.itemCount,
+                key = followerList.itemKey { it.id }
+            ) { index ->
+                val item = followerList[index]
+                if (item != null) {
+                    SearchUserItem(
+                        user = item
+                    )
+                }
+            }
+
+            when (val loadState = followerList.loadState.append) {
+                is LoadState.Loading -> {
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+                is LoadState.Error -> {
+                    item {
+                        Text(text = "오류 발생: ${loadState.error.message}")
+                    }
+                }
+                is LoadState.NotLoading -> {
+                    if (loadState.endOfPaginationReached && followerList.itemCount == 0) {
+                        item {
+                            Text(
+                                text = "검색 결과가 없습니다.",
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
+
+
     }
 }

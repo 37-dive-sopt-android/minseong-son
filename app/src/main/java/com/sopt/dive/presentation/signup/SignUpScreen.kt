@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -48,8 +49,11 @@ import com.sopt.dive.presentation.signup.util.validateSignUpForm
 @Composable
 fun SignUpRoute(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     onSignUpSuccess: () -> Unit,
-    viewModel: SignUpViewModel = viewModel()
+    viewModel: SignUpViewModel = viewModel(
+        factory = viewModelFactory
+    )
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current

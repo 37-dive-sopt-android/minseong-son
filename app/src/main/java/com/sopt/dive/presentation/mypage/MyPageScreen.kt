@@ -32,13 +32,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
+import com.sopt.dive.core.localstorage.AuthManager
 import com.sopt.dive.core.util.UiState
+import com.sopt.dive.data.auth.repository.AuthRepository
+import com.sopt.dive.data.user.repository.UserRepository
 import com.sopt.dive.presentation.mypage.component.ProfileImageHolder
 import com.sopt.dive.presentation.mypage.component.UserInfoHolder
 import com.sopt.dive.presentation.mypage.state.MyPageSideEffect
@@ -47,9 +51,12 @@ import com.sopt.dive.presentation.mypage.state.MyPageState
 @Composable
 fun MyPageRoute(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     navigateSignIn: () -> Unit,
     navigateEasterEgg: () -> Unit,
-    viewModel: MyPageViewModel = viewModel(),
+    viewModel: MyPageViewModel = viewModel(
+        factory = viewModelFactory
+    ),
 ) {
     val lifeCycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
