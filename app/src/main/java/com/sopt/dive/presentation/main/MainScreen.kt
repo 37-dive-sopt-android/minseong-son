@@ -24,7 +24,8 @@ import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun MainScreen(
-    appState: MainAppState = rememberMainAppState()
+    dependencies: AppDependencies,
+    appState: MainAppState = rememberMainAppState(),
 ) {
     val isBottomBarVisible by appState.isBottomBarVisible.collectAsStateWithLifecycle()
     val currentTab by appState.currentTab.collectAsStateWithLifecycle()
@@ -82,12 +83,14 @@ fun MainScreen(
             )
             searchGraph(
                 paddingValues = innerPadding,
-                navigateUp = appState::navigateUp
+                navigateUp = appState::navigateUp,
+                viewModelFactory = dependencies.viewModelFactory
             )
             myPageGraph(
                 paddingValues = innerPadding,
+                viewModelFactory = dependencies.viewModelFactory,
                 navigateSignIn = appState::navigateToSignIn,
-                navigateEasterEgg = appState::navigateToEasterEgg
+                navigateEasterEgg = appState::navigateToEasterEgg,
             )
             easterEggGraph(
                 paddingValues = innerPadding
@@ -96,11 +99,13 @@ fun MainScreen(
             signInGraph(
                 paddingValues = innerPadding,
                 onSignInClick = appState::navigateToClearHome,
-                onSignUpClick = appState::navigateToSignUp
+                onSignUpClick = appState::navigateToSignUp,
+                viewModelFactory = dependencies.viewModelFactory
             )
             signUpGraph(
                 paddingValues = innerPadding,
-                onSignUpSuccess = appState::navigateToSignIn
+                onSignUpSuccess = appState::navigateToSignIn,
+                viewModelFactory = dependencies.viewModelFactory
             )
         }
     }
