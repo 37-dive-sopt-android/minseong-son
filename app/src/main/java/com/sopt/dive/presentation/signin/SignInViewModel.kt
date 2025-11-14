@@ -2,7 +2,7 @@ package com.sopt.dive.presentation.signin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sopt.dive.data.auth.di.AuthRepositoryPool
+import com.sopt.dive.core.localstorage.AuthManager
 import com.sopt.dive.data.auth.repository.AuthRepository
 import com.sopt.dive.presentation.signin.model.toModel
 import com.sopt.dive.presentation.signin.state.SignInSideEffect
@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SignInViewModel (
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val authManager: AuthManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
@@ -24,9 +25,14 @@ class SignInViewModel (
 
     fun postLogin() {
         viewModelScope.launch {
+            val signInUiModel = _state.value.signInUiModel
+
             authRepository.postLogin(
-                loginRequestModel = _state.value.signInUiModel.toModel()
-            ).onSuccess {
+                loginRequestModel = signInUiModel.toModel()
+            ).onSuccess { result ->
+                authManager.saveId(
+                    id = result.userId.toString()
+                )
                 _sideEffect.emit(SignInSideEffect.SignInSuccess)
             }.onFailure {
                 _sideEffect.emit(SignInSideEffect.ToastMessage(it.message.toString()))

@@ -1,11 +1,9 @@
 package com.sopt.dive.presentation.main
 
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.sopt.dive.core.di.DiveSoptViewModelFactory
 import com.sopt.dive.core.localstorage.AuthManager
 import com.sopt.dive.data.auth.repository.AuthRepository
-import com.sopt.dive.data.local.AppDatabase
 import com.sopt.dive.data.social.repository.SocialRepository
 import com.sopt.dive.data.user.repository.UserRepository
 import com.sopt.dive.presentation.mypage.MyPageViewModel
@@ -26,7 +24,8 @@ data class AppDependencies(
         mapOf(
             SignInViewModel::class.java to {
                 SignInViewModel(
-                    authRepository = authRepository
+                    authRepository = authRepository,
+                    authManager = authManager
                 )
             },
 

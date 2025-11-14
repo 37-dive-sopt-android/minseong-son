@@ -3,7 +3,6 @@ package com.sopt.dive.presentation.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sopt.dive.core.localstorage.AuthManager
-import com.sopt.dive.data.auth.di.AuthRepositoryPool
 import com.sopt.dive.data.auth.repository.AuthRepository
 import com.sopt.dive.presentation.signup.model.toModel
 import com.sopt.dive.presentation.signup.state.SignUpSideEffect
@@ -26,8 +25,9 @@ class SignUpViewModel(
 
     fun postSignUp() {
         viewModelScope.launch {
+            val signUpUiModel = _state.value.signUpUiModel
             authRepository.postSignUp(
-                signUpRequestModel = _state.value.signUpUiModel.toModel()
+                signUpRequestModel = signUpUiModel.toModel()
             ).onSuccess { result ->
                 authManager.saveId(
                     id = result.id.toString(),

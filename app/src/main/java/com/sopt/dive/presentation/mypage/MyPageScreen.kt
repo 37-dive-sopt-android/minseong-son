@@ -39,10 +39,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
-import com.sopt.dive.core.localstorage.AuthManager
 import com.sopt.dive.core.util.UiState
-import com.sopt.dive.data.auth.repository.AuthRepository
-import com.sopt.dive.data.user.repository.UserRepository
 import com.sopt.dive.presentation.mypage.component.ProfileImageHolder
 import com.sopt.dive.presentation.mypage.component.UserInfoHolder
 import com.sopt.dive.presentation.mypage.state.MyPageSideEffect

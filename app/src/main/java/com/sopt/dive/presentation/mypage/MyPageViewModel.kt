@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sopt.dive.core.localstorage.AuthManager
 import com.sopt.dive.core.util.UiState
-import com.sopt.dive.data.auth.di.AuthRepositoryPool
 import com.sopt.dive.data.auth.repository.AuthRepository
-import com.sopt.dive.data.user.di.UserRepositoryPool
 import com.sopt.dive.data.user.repository.UserRepository
 import com.sopt.dive.presentation.mypage.model.MyPagePatchUiModel
 import com.sopt.dive.presentation.mypage.model.toModel
