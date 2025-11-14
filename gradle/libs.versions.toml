@@ -29,6 +29,13 @@ okhttp = "4.11.0"
 retrofit = "2.11.0"
 retrofitKotlinSerializationConverter = "1.0.0"
 
+# Room
+room_version = "2.8.3"
+ksp = "2.3.0"
+
+# Paging
+paging = "3.3.0"
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -65,12 +72,24 @@ okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-i
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerializationConverter" }
 
+# Room
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room_version" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room_version" }
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room_version" }
+
+# Paging
+paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Room
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
 androidx = [
@@ -106,7 +125,22 @@ retrofit = [
     "retrofit-kotlin-serialization-converter"
 ]
 
-test = [
+room = [
+    "room-runtime",
+    "room-ktx",
+    "room-paging"
+]
+
+paging = [
+    "paging-runtime-ktx",
+    "paging-compose"
+]
+
+unit-test = [
+    "junit"
+]
+
+instrumented-test = [
     "androidx-junit",
     "androidx-espresso-core",
     "androidx-ui-test-junit4"

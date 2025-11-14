@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 val properties = Properties().apply {
@@ -47,21 +48,34 @@ android {
             jvmTarget = JvmTarget.JVM_11
         }
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
     buildFeatures {
         compose = true
         buildConfig = true
     }
 }
 
+
+
 dependencies {
     implementation(libs.bundles.androidx)
-    implementation(libs.bundles.test)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.kotlinx)
     implementation(platform(libs.okhttp.bom))
     implementation(libs.bundles.okhttp)
     implementation(libs.bundles.retrofit)
-
-    debugImplementation(libs.bundles.debug)
     implementation(libs.coil.compose)
+    implementation(libs.bundles.room)
+    implementation(libs.bundles.paging)
+    ksp(libs.room.compiler)
+    debugImplementation(libs.bundles.debug)
+    testImplementation(libs.bundles.unit.test)
+    androidTestImplementation(libs.bundles.instrumented.test)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+}
+
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
 }
