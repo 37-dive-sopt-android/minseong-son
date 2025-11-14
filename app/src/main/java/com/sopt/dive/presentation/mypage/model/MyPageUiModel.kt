@@ -1,6 +1,6 @@
 package com.sopt.dive.presentation.mypage.model
 
-import com.sopt.dive.data.mypage.model.MyPageModel
+import com.sopt.dive.data.user.model.UserModel
 
 data class MyPageUiModel(
     val id: Long = 0L,
@@ -9,7 +9,7 @@ data class MyPageUiModel(
     val myPagePatchUiModel: MyPagePatchUiModel = MyPagePatchUiModel()
 )
 
-fun MyPageModel.toUiModel() = MyPageUiModel(
+fun UserModel.toUiModel() = MyPageUiModel(
     id = id,
     username = username,
     status = status,

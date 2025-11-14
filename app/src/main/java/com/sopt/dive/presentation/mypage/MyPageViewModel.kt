@@ -6,8 +6,8 @@ import com.sopt.dive.core.localstorage.AuthManager
 import com.sopt.dive.core.util.UiState
 import com.sopt.dive.data.auth.di.AuthRepositoryPool
 import com.sopt.dive.data.auth.repository.AuthRepository
-import com.sopt.dive.data.mypage.di.MyPageRepositoryPool
-import com.sopt.dive.data.mypage.repository.MyPageRepository
+import com.sopt.dive.data.user.di.UserRepositoryPool
+import com.sopt.dive.data.user.repository.UserRepository
 import com.sopt.dive.presentation.mypage.model.MyPagePatchUiModel
 import com.sopt.dive.presentation.mypage.model.toModel
 import com.sopt.dive.presentation.mypage.model.toUiModel
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MyPageViewModel (
-    private val myPageRepository: MyPageRepository = MyPageRepositoryPool.myPageRepository,
+    private val userRepository: UserRepository = UserRepositoryPool.userRepository,
     private val authRepository: AuthRepository = AuthRepositoryPool.authRepository,
     private val authManager: AuthManager = AuthManager
 ) : ViewModel() {
@@ -37,7 +37,7 @@ class MyPageViewModel (
 
     fun getUserProfile() {
         viewModelScope.launch {
-            myPageRepository.getUserProfile(
+            userRepository.getUserProfile(
                 userId = authManager.getSavedId().toLong()
             ).onSuccess { result ->
                 _state.update { currentState ->
@@ -59,9 +59,9 @@ class MyPageViewModel (
     ) {
         if (name.isNotEmpty() && email.isNotEmpty() && age.isNotEmpty()) {
             viewModelScope.launch {
-                myPageRepository.editUserProfile(
+                userRepository.editUserProfile(
                     userId = authManager.getSavedId().toLong(),
-                    myPagePatchModel = MyPagePatchUiModel(
+                    userPatchModel = MyPagePatchUiModel(
                         name = name,
                         email = email,
                         age = age.toInt(),

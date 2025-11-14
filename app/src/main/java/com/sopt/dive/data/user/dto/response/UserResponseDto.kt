@@ -1,10 +1,10 @@
-package com.sopt.dive.data.mypage.dto.response
+package com.sopt.dive.data.user.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MyPageResponseDto(
+data class UserResponseDto(
     @SerialName("id")
     val id: Long,
     @SerialName("username")

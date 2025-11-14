@@ -10,7 +10,8 @@ import com.sopt.dive.BuildConfig
 
 object ApiFactory {
 
-    private const val BASE_URL = BuildConfig.BASE_URL_REQUIRED
+    private const val BASE_URL_REQUIRED = BuildConfig.BASE_URL_REQUIRED
+    private const val BASE_URL_ADVANCED = BuildConfig.BASE_URL_ADVANCED
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -25,13 +26,23 @@ object ApiFactory {
         isLenient = true
     }
 
-    val retrofit: Retrofit by lazy {
+    val retrofitRequired: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL_REQUIRED)
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
     }
 
-    inline fun <reified T> create(): T = retrofit.create(T::class.java)
+    val retrofitAdvanced: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL_ADVANCED)
+            .client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    inline fun <reified T> createRequired(): T = retrofitRequired.create(T::class.java)
+
+    inline fun <reified T> createAdvanced(): T = retrofitAdvanced.create(T::class.java)
 }

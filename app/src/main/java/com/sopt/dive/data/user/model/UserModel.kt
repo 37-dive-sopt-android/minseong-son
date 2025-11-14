@@ -1,8 +1,8 @@
-package com.sopt.dive.data.mypage.model
+package com.sopt.dive.data.user.model
 
-import com.sopt.dive.data.mypage.dto.response.MyPageResponseDto
+import com.sopt.dive.data.user.dto.response.UserResponseDto
 
-data class MyPageModel (
+data class UserModel (
     val id: Long,
     val username: String,
     val name: String,
@@ -11,7 +11,7 @@ data class MyPageModel (
     val status: String
 )
 
-fun MyPageResponseDto.toModel() = MyPageModel(
+fun UserResponseDto.toModel() = UserModel(
     id = this.id,
     username = this.username,
     name = this.name,

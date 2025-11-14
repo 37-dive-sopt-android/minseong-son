@@ -5,6 +5,6 @@ import com.sopt.dive.data.auth.sevice.AuthService
 
 object ServicePool {
     val authService: AuthService by lazy {
-        ApiFactory.create<AuthService>()
+        ApiFactory.createRequired<AuthService>()
     }
 }

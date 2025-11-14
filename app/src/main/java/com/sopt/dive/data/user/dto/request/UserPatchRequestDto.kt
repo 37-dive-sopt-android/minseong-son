@@ -1,10 +1,10 @@
-package com.sopt.dive.data.mypage.dto.request
+package com.sopt.dive.data.user.dto.request
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MyPagePatchRequestDto(
+data class UserPatchRequestDto(
     @SerialName("name")
     val name: String?,
     @SerialName("email")
