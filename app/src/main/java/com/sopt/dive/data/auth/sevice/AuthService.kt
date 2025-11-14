@@ -11,19 +11,18 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface AuthService {
-    @POST("users")
+    @POST("v1/users")
     suspend fun postSignUp(
         @Body requestBody: SignUpRequestDto
     ): BaseResponse<SignUpResponseDto>
 
-    @POST("auth/login")
+    @POST("v1/auth/login")
     suspend fun postLogin(
        @Body requestBody: LoginRequestDto
     ): BaseResponse<LoginResponseDto>
 
-    @HTTP(method = "DELETE", path = "users/{id}", hasBody = false)
+    @HTTP(method = "DELETE", path = "v1/users/{id}", hasBody = false)
     suspend fun deleteUser(
         @Path("id") id: Long
     ) : BaseResponse<Unit>
-
 }
