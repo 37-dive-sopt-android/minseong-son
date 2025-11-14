@@ -21,9 +21,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MyPageViewModel (
-    private val userRepository: UserRepository = UserRepositoryPool.userRepository,
-    private val authRepository: AuthRepository = AuthRepositoryPool.authRepository,
-    private val authManager: AuthManager = AuthManager
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository,
+    private val authManager: AuthManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(MyPageState())
     val state = _state.asStateFlow()
