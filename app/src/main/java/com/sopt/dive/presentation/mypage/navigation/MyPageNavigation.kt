@@ -1,6 +1,7 @@
 package com.sopt.dive.presentation.mypage.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -17,6 +18,7 @@ fun NavController.navigateMyPage(
 
 fun NavGraphBuilder.myPageGraph(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     navigateSignIn: () -> Unit,
     navigateEasterEgg: () -> Unit
 ) {
@@ -24,7 +26,8 @@ fun NavGraphBuilder.myPageGraph(
         MyPageRoute(
             paddingValues = paddingValues,
             navigateSignIn = navigateSignIn,
-            navigateEasterEgg = navigateEasterEgg
+            navigateEasterEgg = navigateEasterEgg,
+            viewModelFactory = viewModelFactory
         )
     }
 }
