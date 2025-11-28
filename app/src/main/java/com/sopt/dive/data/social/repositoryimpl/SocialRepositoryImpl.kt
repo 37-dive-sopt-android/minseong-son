@@ -38,7 +38,7 @@ class SocialRepositoryImpl (
                 cacheSource = cacheSource
             )
         )
-            .flow
+            .flow // Pager 객체를 Flow로 변환
             .map { pagingData ->
                 pagingData.map { followerEntity ->
                     followerEntity.toDto().toModel()
