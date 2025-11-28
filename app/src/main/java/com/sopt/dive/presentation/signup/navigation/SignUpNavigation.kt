@@ -1,6 +1,7 @@
 package com.sopt.dive.presentation.signup.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -17,12 +18,14 @@ fun NavController.navigateSignUp(
 
 fun NavGraphBuilder.signUpGraph(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     onSignUpSuccess: () -> Unit
 ) {
     composable<SignUp> {
         SignUpRoute(
             paddingValues = paddingValues,
-            onSignUpSuccess = onSignUpSuccess
+            onSignUpSuccess = onSignUpSuccess,
+            viewModelFactory = viewModelFactory
         )
     }
 }

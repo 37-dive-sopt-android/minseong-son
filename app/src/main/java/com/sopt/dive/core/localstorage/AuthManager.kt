@@ -1,4 +1,4 @@
-package com.sopt.dive.data.remote
+package com.sopt.dive.core.localstorage
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -44,6 +44,14 @@ object AuthManager {
                 putString(KEY_USER_PASSWORD, password)
                 putString(KEY_USER_NICKNAME, nickname)
                 putString(KEY_USER_ALCOHOL, alcohol)
+            }
+        }
+    }
+
+    suspend fun saveId(id: String) {
+        withContext(Dispatchers.IO) {
+            prefs.edit {
+                putString(KEY_USER_ID, id)
             }
         }
     }

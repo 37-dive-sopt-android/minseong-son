@@ -8,16 +8,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.component.FormField
@@ -39,54 +42,59 @@ import com.sopt.dive.core.util.IdInputTransformation
 import com.sopt.dive.core.util.NicknameInputTransformation
 import com.sopt.dive.core.util.PasswordInputTransformation
 import com.sopt.dive.core.util.PasswordOutputTransformation
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.presentation.signup.state.SignUpSideEffect
+import com.sopt.dive.presentation.signup.state.SignUpState
 import com.sopt.dive.presentation.signup.util.validateSignUpForm
-import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpRoute(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     onSignUpSuccess: () -> Unit,
+    viewModel: SignUpViewModel = viewModel(
+        factory = viewModelFactory
+    )
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    val scope = rememberCoroutineScope()
+    val lifeCycle = LocalLifecycleOwner.current
+
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
-    val idText = rememberTextFieldState()
-    val passwordText = rememberTextFieldState()
-    val nicknameText = rememberTextFieldState()
-    val alcoholText = rememberTextFieldState()
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.flowWithLifecycle(lifeCycle.lifecycle)
+            .collect {
+                when (it) {
+                    is SignUpSideEffect.SignUpSuccess -> {
+                        Toast.makeText(context, "회원가입 성공", Toast.LENGTH_SHORT).show()
+                        onSignUpSuccess()
+                    }
+
+                    is SignUpSideEffect.ToastMessage -> {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+    }
 
     SignUpScreen(
         paddingValues = paddingValues,
-        idText = idText,
-        passwordText = passwordText,
-        nicknameText = nicknameText,
-        alcoholText = alcoholText,
+        uiState = uiState,
         isPasswordVisible = isPasswordVisible,
         onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
         onSignUpClick = {
             val isValid = validateSignUpForm(
                 context = context,
-                idText = idText.text.toString(),
-                passwordText = passwordText.text.toString(),
-                nicknameText = nicknameText.text.toString()
+                nameText = uiState.signUpUiModel.nameText.text.toString(),
+                passwordText = uiState.signUpUiModel.passwordText.text.toString(),
+                nicknameText = uiState.signUpUiModel.nicknameText.text.toString(),
+                emailText = uiState.signUpUiModel.emailText.text.toString()
             )
 
             if (isValid) {
-                scope.launch {
-                    AuthManager.saveUserCredentials(
-                        id = idText.text.toString(),
-                        password = passwordText.text.toString(),
-                        nickname = nicknameText.text.toString(),
-                        alcohol = alcoholText.text.toString()
-                    )
-                }
-
-                Toast.makeText(context, "솝트에 온 걸 환영해요!", Toast.LENGTH_SHORT).show()
-                onSignUpSuccess()
+                viewModel.postSignUp()
             }
         },
         moveFocus = { focusManager.moveFocus(it) },
@@ -97,13 +105,8 @@ fun SignUpRoute(
 @Composable
 fun SignUpScreen(
     paddingValues: PaddingValues,
-
-    idText: TextFieldState,
-    passwordText: TextFieldState,
-    nicknameText: TextFieldState,
-    alcoholText: TextFieldState,
+    uiState: SignUpState,
     isPasswordVisible: Boolean,
-
     moveFocus: (FocusDirection) -> Unit,
     clearFocus: () -> Unit,
     onVisibilityChange: () -> Unit,
@@ -126,9 +129,9 @@ fun SignUpScreen(
         )
 
         FormField(
-            state = idText,
-            label = "ID",
-            placeholder = "아이디를 입력해주세요",
+            state = uiState.signUpUiModel.nameText,
+            label = "NAME",
+            placeholder = "이름을 입력해주세요",
             imeAction = ImeAction.Next,
             onImeAction = {
                 moveFocus(FocusDirection.Down)
@@ -137,11 +140,10 @@ fun SignUpScreen(
         )
 
         FormField(
-            state = passwordText,
+            state = uiState.signUpUiModel.passwordText,
             label = "PASSWORD",
             placeholder = "비밀번호를 입력해주세요",
             imeAction = ImeAction.Next,
-            modifier = Modifier,
             inputTransformation = PasswordInputTransformation,
             outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
             onImeAction = {
@@ -164,11 +166,10 @@ fun SignUpScreen(
         )
 
         FormField(
+            state = uiState.signUpUiModel.nicknameText,
             label = "NICKNAME",
-            state = nicknameText,
             placeholder = "닉네임을 다시 입력해주세요",
             imeAction = ImeAction.Next,
-            modifier = Modifier,
             inputTransformation = NicknameInputTransformation,
             onImeAction = {
                 moveFocus(FocusDirection.Down)
@@ -176,11 +177,20 @@ fun SignUpScreen(
         )
 
         FormField(
-            label = "주량",
-            state = alcoholText,
-            placeholder = "주량을 입력해주세요",
+            label = "EMAIL",
+            state = uiState.signUpUiModel.emailText,
+            placeholder = "이메일을 입력해주세요",
+            imeAction = ImeAction.Next,
+            onImeAction = {
+                moveFocus(FocusDirection.Down)
+            },
+        )
+
+        FormField(
+            label = "AGE",
+            state = uiState.signUpUiModel.ageText,
+            placeholder = "나이를 입력해주세요",
             imeAction = ImeAction.Done,
-            modifier = Modifier,
             onImeAction = clearFocus
         )
 

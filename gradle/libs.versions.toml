@@ -1,8 +1,9 @@
 [versions]
 # kotlin
 agp = "8.10.0"
-kotlin = "2.0.21"
+kotlin = "2.2.21"
 kotlinxImmutable = "0.4.0"
+kotlinxSerializationJson = "1.9.0"
 
 # Test
 junit = "4.13.2"
@@ -22,6 +23,18 @@ runtime = "1.9.3"
 
 # Coil
 coil = "2.7.0"
+
+# Network
+okhttp = "4.11.0"
+retrofit = "2.11.0"
+retrofitKotlinSerializationConverter = "1.0.0"
+
+# Room
+room_version = "2.8.3"
+ksp = "2.3.0"
+
+# Paging
+paging = "3.3.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -47,15 +60,36 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 
 # Kotlin
 kotlinx-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutable" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 # Coil
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+
+# Network
+okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-kotlin-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerializationConverter" }
+
+# Room
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room_version" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room_version" }
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room_version" }
+
+# Paging
+paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Room
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
 androidx = [
@@ -72,7 +106,8 @@ androidx = [
 ]
 
 kotlinx = [
-    "kotlinx-immutable"
+    "kotlinx-immutable",
+    "kotlinx-serialization-json"
 ]
 
 debug = [
@@ -80,7 +115,32 @@ debug = [
     "androidx-ui-test-manifest"
 ]
 
-test = [
+okhttp = [
+    "okhttp",
+    "okhttp-logging-interceptor"
+]
+
+retrofit = [
+    "retrofit",
+    "retrofit-kotlin-serialization-converter"
+]
+
+room = [
+    "room-runtime",
+    "room-ktx",
+    "room-paging"
+]
+
+paging = [
+    "paging-runtime-ktx",
+    "paging-compose"
+]
+
+unit-test = [
+    "junit"
+]
+
+instrumented-test = [
     "androidx-junit",
     "androidx-espresso-core",
     "androidx-ui-test-junit4"

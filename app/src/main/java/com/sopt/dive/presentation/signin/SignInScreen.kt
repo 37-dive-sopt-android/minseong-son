@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -32,6 +30,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sopt.dive.R
 import com.sopt.dive.core.designsystem.component.DiveSoptButton
 import com.sopt.dive.core.designsystem.component.FormField
@@ -41,42 +44,51 @@ import com.sopt.dive.core.extension.noRippleClickable
 import com.sopt.dive.core.util.IdInputTransformation
 import com.sopt.dive.core.util.PasswordInputTransformation
 import com.sopt.dive.core.util.PasswordOutputTransformation
-import com.sopt.dive.data.remote.AuthManager
+import com.sopt.dive.presentation.signin.model.SignInUiModel
+import com.sopt.dive.presentation.signin.state.SignInSideEffect
+import com.sopt.dive.presentation.signin.state.SignInState
 
 @Composable
 fun SignInRoute(
     paddingValues: PaddingValues,
+    viewModelFactory: ViewModelProvider.Factory,
     onSignInClick: () -> Unit,
-    onSignUpClick: () -> Unit
+    onSignUpClick: () -> Unit,
+    viewModel: SignInViewModel = viewModel(
+        factory = viewModelFactory
+    )
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val lifeCycleOwner = LocalLifecycleOwner.current
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
-    val idText = rememberTextFieldState()
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.flowWithLifecycle(lifeCycleOwner.lifecycle)
+            .collect {
+                when(it) {
+                    is SignInSideEffect.SignInSuccess -> {
+                        Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
+                        onSignInClick()
+                    }
 
-    val passwordText = rememberTextFieldState()
-
-    val savedId by remember { mutableStateOf(AuthManager.getSavedId()) }
-    val savedPw by remember { mutableStateOf(AuthManager.getSavedPassword()) }
+                    is SignInSideEffect.ToastMessage -> {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+    }
 
     SignInScreen(
         paddingValues = paddingValues,
-        idText = idText,
-        passwordText = passwordText,
+        uiState = uiState,
         isPasswordVisible = isPasswordVisible,
         onVisibilityChange = {
             isPasswordVisible = !isPasswordVisible
         },
-        onSignInClick = {
-            if (idText.text.toString() == savedId && passwordText.text.toString() == savedPw && idText.text.toString().isNotBlank() && passwordText.text.toString().isNotBlank()) {
-                Toast.makeText(context, "로그인되었습니다", Toast.LENGTH_SHORT).show()
-                onSignInClick()
-            } else {
-                Toast.makeText(context, "아이디 또는 비밀번호가 틀렸습니다", Toast.LENGTH_SHORT).show()
-            }
-        },
+        onSignInClick = viewModel::postLogin,
         moveFocus = {
             focusManager.moveFocus(it)
         },
@@ -90,8 +102,7 @@ fun SignInRoute(
 @Composable
 fun SignInScreen(
     paddingValues: PaddingValues,
-    idText: TextFieldState,
-    passwordText: TextFieldState,
+    uiState: SignInState,
     isPasswordVisible: Boolean,
     moveFocus: (FocusDirection) -> Unit,
     clearFocus: () -> Unit,
@@ -101,9 +112,9 @@ fun SignInScreen(
 ) {
     Column(
         modifier = Modifier
+            .advancedImePadding()
             .padding(16.dp)
-            .padding(paddingValues)
-            .advancedImePadding(),
+            .padding(paddingValues),
     ) {
         Text(
             text = "Welcome To SOPT",
@@ -114,9 +125,9 @@ fun SignInScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         FormField(
-            label = "ID",
-            state = idText,
-            placeholder = "아이디를 입력해주세요",
+            label = "USERNAME",
+            state = uiState.signInUiModel.userName,
+            placeholder = "사용자 명을 입력해주세요",
             imeAction = ImeAction.Next,
             modifier = Modifier,
             inputTransformation = IdInputTransformation,
@@ -130,7 +141,7 @@ fun SignInScreen(
         FormField(
             label = "PASSWORD",
             placeholder = "비밀번호를 입력해주세요",
-            state = passwordText,
+            state = uiState.signInUiModel.password,
             inputTransformation = PasswordInputTransformation,
             outputTransformation = if (isPasswordVisible) null else PasswordOutputTransformation,
             modifier = Modifier,
@@ -177,14 +188,18 @@ private fun SignInScreenPreview() {
     DiveTheme {
         SignInScreen(
             paddingValues = PaddingValues(),
-            idText = rememberTextFieldState(""),
-            passwordText = rememberTextFieldState(""),
             onSignInClick = {},
             onSignUpClick = {},
             isPasswordVisible = false,
             onVisibilityChange = {},
             moveFocus = {},
-            clearFocus = {}
+            clearFocus = {},
+            uiState = SignInState(
+                signInUiModel = SignInUiModel(
+                    userName = rememberTextFieldState(""),
+                    password = rememberTextFieldState("")
+                )
+            )
         )
     }
 }
