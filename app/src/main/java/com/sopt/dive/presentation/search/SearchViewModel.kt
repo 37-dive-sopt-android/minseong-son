@@ -17,6 +17,9 @@ class SearchViewModel (
     private val _state = MutableStateFlow(SearchState())
     val state = _state.asStateFlow()
 
+    //public fun <T : Any> Flow<PagingData<T>>.cachedIn 로
+    // 페이징 데이터의 생명주기를 ViewModel에 한정
+    // PagningData는 Cold Stream의 성경을 가지지만 cachedIn으로 Hot Stream으로 변환
     val followerPagingData = socialRepository.getFollowerPager()
         .map { pagingData ->
             pagingData.map { it.toUiModel() }

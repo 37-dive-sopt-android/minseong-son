@@ -21,7 +21,7 @@ class FollowerRemoteMediator(
     ): MediatorResult {
         return try {
             if (loadType == LoadType.REFRESH) {
-                val latestCacheTime = cacheSource.followerDao().getLatestCacheTime() // ⬅️ DAO에 getLatestCacheTime() 추가 필요
+                val latestCacheTime = cacheSource.followerDao().getLatestCacheTime()
                 val cacheTimeout = 60 * 1000 * 10
 
                 if (latestCacheTime != null && (System.currentTimeMillis() - latestCacheTime) < cacheTimeout) {
